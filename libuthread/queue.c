@@ -122,16 +122,11 @@ int queue_delete(queue_t queue, void *data)
 			if (!temp_next) {
 				queue->last = temp_prev;
 			}
-
 			found = 0;
 			break;
 		}
-
 		temp_prev = node_i;
 		node_i = temp_next;
-		if (node_i) {
-			
-		}
 	}
 
 	return found;
