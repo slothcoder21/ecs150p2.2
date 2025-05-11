@@ -121,6 +121,9 @@ int queue_delete(queue_t queue, void *data)
 			}
 			if (!temp_next) {
 				queue->last = temp_prev;
+				temp_prev->next = NULL;
+			} else if (temp_prev) {
+				temp_prev->next = temp_next;
 			}
 			found = 0;
 			break;
