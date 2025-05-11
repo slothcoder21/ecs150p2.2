@@ -1,5 +1,7 @@
 # ECS 150: Project #2 - Part 2 - User-level thread library #
 
+Assignment Page: [https://canvas.ucdavis.edu/courses/975590/assignments/1433327]
+
 ## Phase 1: queue API ##
 
 - Queue Implementation, described in `./libuthread/queue.h`
