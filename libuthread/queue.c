@@ -114,6 +114,7 @@ int queue_delete(queue_t queue, void *data)
 		temp_next = node_i->next;
 		if (node_i->node_data == data) {
 			free(node_i);
+			queue->length--;
 			if (!temp_prev) {
 				queue->first = temp_next;
 			} else {
@@ -142,7 +143,6 @@ int queue_iterate(queue_t queue, queue_func_t func)
 
 int queue_length(queue_t queue)
 {
-	/* TODO Phase 1 */
 	return queue->length;
 }
 
