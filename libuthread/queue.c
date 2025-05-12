@@ -18,23 +18,16 @@ struct queue_node {
 	node_t next;
 };
 
-
+/* 
+ * If we need O(1) operations, the best data structure for this
+ * would probably be a linked list, since we don't need access
+ * to the middle elements of the list.
+ */
 struct queue {
-	/* TODO Phase 1 */
-
-	/* 
-	 * If we need O(1) operations, the best data structure for this
-	 * would probably be a linked list, since we don't need access
-	 * to the middle elements of the list.
-	 */
-
 	node_t first;
 	node_t last;
 	int length;
 };
-
-
-
 
 queue_t queue_create(void)
 {
