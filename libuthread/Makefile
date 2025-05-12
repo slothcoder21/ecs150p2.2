@@ -13,7 +13,6 @@ all: $(lib)
 $(lib): ${objs}
 	ar rcs $@ ${objs}
 
-
 # Include dependencies
 deps := $(patsubst %.o,%.d,$(objs))
 -include $(deps)
@@ -22,4 +21,4 @@ deps := $(patsubst %.o,%.d,$(objs))
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
-	rm -f $(lib) $(objs)
+	rm -f $(lib) $(objs) $(deps)
