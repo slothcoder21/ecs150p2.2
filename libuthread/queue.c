@@ -4,8 +4,6 @@
 
 #include "queue.h"
 
-#include <stdio.h>
-
 struct queue_node;
 typedef struct queue_node* node_t;
 

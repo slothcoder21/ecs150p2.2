@@ -12,9 +12,8 @@ all: $(lib)
 $(lib): ${objs}
 	ar rcs $@ ${objs}
 
-# Dep tracking *must* be below the 'all' rule
-deps := $(patsubst %.o,%.d,$(objs))
--include $(deps)
-
 %.o: %.c %.h
 	$(CC) $(CFLAGS) -c -o $@ $<
+
+clean:
+	rm -f $(lib) $(objs)

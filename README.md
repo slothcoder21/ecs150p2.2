@@ -10,16 +10,18 @@ Assignment Page: [https://canvas.ucdavis.edu/courses/975590/assignments/1433327]
     - [X] Implement function `queue_destroy()`
     - [X] Implement function `queue_enqueue()`
     - [X] Implement function `queue_dequeue()`
+    - [X] Implement function `queue_delete()`
     - [X] Implement function `queue_iterate()`
     - [X] Implement function `queue_length()`
     - [X] Test function `queue_create()`
-    - [ ] Test function `queue_destroy()`
+    - [X] Test function `queue_destroy()`
     - [X] Test function `queue_enqueue()`
     - [X] Test function `queue_dequeue()`
-    - [ ] Test function `queue_iterate()`
-    - [ ] Test function `queue_length()`
-- [ ] Complete Makefile
-- [ ] Create a tester program `./apps/queue_tester.c`
+    - [X] Test function `queue_delete()`
+    - [X] Test function `queue_iterate()`
+    - [X] Test function `queue_length()`
+- [?] Complete Makefile
+- [X] Create a tester program `./apps/queue_tester.c`
 
 ## Phase 2: uthread API ##
 
