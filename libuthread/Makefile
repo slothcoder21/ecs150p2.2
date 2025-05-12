@@ -1,6 +1,7 @@
-objs := queue.o
+objs := queue.o uthread.o preempt.o
 
 CFLAGS := -Wall -Wextra -Werror
+CFLAGS += -MMD
 CC := gcc
 
 # Target library
@@ -12,7 +13,12 @@ all: $(lib)
 $(lib): ${objs}
 	ar rcs $@ ${objs}
 
-%.o: %.c %.h
+
+# Include dependencies
+deps := $(patsubst %.o,%.d,$(objs))
+-include $(deps)
+
+%.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:

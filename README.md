@@ -35,9 +35,11 @@ Assignment Page: [https://canvas.ucdavis.edu/courses/975590/assignments/1433327]
     - [ ] Test public function `uthread_create()`
     - [ ] Test public function `uthread_exit()`
 - Private data structure
-    - [ ] Implement TCB data structure `struct uthread_tct`
+    - [ ] Implement TCB data structure `struct uthread_tcb`
     - [ ] Implement private function `uthread_block()`
     - [ ] Implement private function `uthread_unblock()`
+    - [ ] Test private function `uthread_block()`
+    - [ ] Test private function `uthread_unblock()`
 
 ## Phase 3: semaphore API ##
 
