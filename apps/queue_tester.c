@@ -37,6 +37,40 @@ void test_queue_simple(void)
 	TEST_ASSERT(ptr == &data);
 }
 
+
+void test_queue_advanced(void)
+{
+    int data[5] = {1, 3, 6, 2, 4}, *ptr = NULL;
+    queue_t q;
+
+    fprintf(stderr, "*** TEST queue_advanced ***\n");
+    
+    q = queue_create();
+    for (int i = 0; i < 5; i++) {
+        queue_enqueue(q, &data[i]);
+        queue_dequeue(q, (void**)&ptr);
+        TEST_ASSERT(*ptr == data[i]);
+    }
+
+    int err = queue_destroy(q);
+    TEST_ASSERT(err == 0);
+}
+
+
+void test_queue_destroy(void)
+{
+	int data = 2, *ptr = NULL;
+	queue_t q;
+
+	fprintf(stderr, "*** TEST queue_destroy ***\n");
+
+	q = queue_create();
+	queue_enqueue(q, &data);
+	TEST_ASSERT(queue_destroy(q) == -1);
+	queue_dequeue(q, (void**)&ptr);
+	TEST_ASSERT(queue_destroy(q) == 0);
+}
+
 void test_queue_delete(void)
 {
 	int data = 3, data2 = 2;
@@ -99,6 +133,8 @@ int main(void)
 {
 	test_create();
 	test_queue_simple();
+    test_queue_advanced();
+	test_queue_destroy();
 	test_queue_delete();
 	test_queue_error_detection();
 	test_queue_iterate();
