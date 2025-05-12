@@ -43,7 +43,6 @@ struct uthread_tcb *uthread_current(void)
 
 void uthread_yield(void)
 {
-	/* TODO Phase 2 */
 	struct uthread_tcb *current = uthread_current();
 	current->state = READY;
 	uthread_ctx_switch(&current->context, &main_ctx->context);
@@ -51,7 +50,6 @@ void uthread_yield(void)
 
 void uthread_exit(void)
 {
-	/* TODO Phase 2 */
 	struct uthread_tcb *current = uthread_current();
 	current->state = TERMINATED;
 	uthread_ctx_switch(&current->context, &main_ctx->context);
@@ -59,25 +57,25 @@ void uthread_exit(void)
 
 int uthread_create(uthread_func_t func, void *arg)
 {
-	/* TODO Phase 2 */
 	struct uthread_tcb *thread = malloc(sizeof(struct uthread_tcb)); 
 
 	if (!thread) {
 		return -1;
 	}
 
-	thread->stack_ptr = uthread_ctx_alloc_stack();
+	if (!(thread->stack_ptr = uthread_ctx_alloc_stack()))
+		return -1;
+
 	thread->state = READY;
-
 	uthread_ctx_init(&thread->context, thread->stack_ptr, func, arg);
-
 	queue_enqueue(thread_q, thread);
+
 	return 0;
 }
 
 int uthread_run(bool preempt, uthread_func_t func, void *arg)
 {
-	/* TODO Phase 2 */
+	/* TODO */
 	if (preempt) {
 		
 	}
@@ -87,11 +85,8 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
 	main_ctx = malloc(sizeof(struct uthread_tcb));
 	main_ctx->stack_ptr = uthread_ctx_alloc_stack();
 
-	struct uthread_tcb *init_thread = malloc(sizeof(struct uthread_tcb)); 
-	init_thread->stack_ptr = uthread_ctx_alloc_stack();
-	uthread_ctx_init(&init_thread->context, init_thread->stack_ptr, func, arg);
-
-	queue_enqueue(thread_q, init_thread);
+	if (uthread_create(func, arg))
+		return -1;
 
 	while(queue_destroy(thread_q) != 0) {
 		queue_dequeue(thread_q, (void**)&current_thread);
@@ -120,12 +115,13 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
 
 void uthread_block(void)
 {
-	/* TODO Phase 3 */
+	struct uthread_tcb *current = uthread_current();
+	current->state = BLOCKED;
+	uthread_ctx_switch(&current->context, &main_ctx->context);
 }
 
 void uthread_unblock(struct uthread_tcb *uthread)
 {
-	/* TODO Phase 3 */
-	(void)uthread;
+	uthread->state = READY;
 }
 
