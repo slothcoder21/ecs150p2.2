@@ -96,17 +96,16 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
 	while(queue_destroy(thread_q) != 0) {
 		queue_dequeue(thread_q, (void**)&current_thread);
 		if (current_thread->state == READY) {
-			//printf("yahoo\n");
 			current_thread->state = RUNNING;
 			main_ctx->state = READY;
 			uthread_ctx_switch(&main_ctx->context, &current_thread->context);
 			main_ctx->state = RUNNING;
 			if (current_thread->state == READY || current_thread->state == BLOCKED) 
-			{
-				//printf("yippee\n");
 				queue_enqueue(thread_q, current_thread);
+			else {
+				uthread_ctx_destroy_stack((current_thread)->stack_ptr);
+				free(current_thread);
 			}
-				
 		}
 		else if ((current_thread)->state == TERMINATED) {
 			uthread_ctx_destroy_stack((current_thread)->stack_ptr);
@@ -116,7 +115,6 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
 			queue_enqueue(thread_q, current_thread);
 	}
 
-	//printf("done\n");
 	return 0;
 }
 
