@@ -80,10 +80,14 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
 		
 	}
 
-	thread_q = queue_create();
+	if (!(thread_q = queue_create()))
+		return -1;
 
-	main_ctx = malloc(sizeof(struct uthread_tcb));
-	main_ctx->stack_ptr = uthread_ctx_alloc_stack();
+	if (!(main_ctx = malloc(sizeof(struct uthread_tcb))))
+		return -1;
+
+	if (!(main_ctx->stack_ptr = uthread_ctx_alloc_stack()))
+		return 1;
 
 	if (uthread_create(func, arg))
 		return -1;
