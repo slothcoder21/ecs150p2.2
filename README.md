@@ -5,13 +5,19 @@ Assignment Page: [https://canvas.ucdavis.edu/courses/975590/assignments/1433327]
 ## Phase 1: queue API ##
 
 - Queue Implementation, described in `./libuthread/queue.h`
-    - [ ] Implement queue data structure `queue_t`
-    - [ ] Implement public function `queue_create()`
-    - [ ] Implement public function `queue_destroy()`
-    - [ ] Implement public function `queue_enqueue()`
-    - [ ] Implement public function `queue_dequeue()`
-    - [ ] Implement public function `queue_iterate()`
-    - [ ] Implement public function `queue_length()`
+    - [X] Implement queue data structure `queue_t`
+    - [X] Implement function `queue_create()`
+    - [X] Implement function `queue_destroy()`
+    - [X] Implement function `queue_enqueue()`
+    - [X] Implement function `queue_dequeue()`
+    - [X] Implement function `queue_iterate()`
+    - [X] Implement function `queue_length()`
+    - [X] Test function `queue_create()`
+    - [ ] Test function `queue_destroy()`
+    - [X] Test function `queue_enqueue()`
+    - [X] Test function `queue_dequeue()`
+    - [ ] Test function `queue_iterate()`
+    - [ ] Test function `queue_length()`
 - [ ] Complete Makefile
 - [ ] Create a tester program `./apps/queue_tester.c`
 
@@ -22,6 +28,10 @@ Assignment Page: [https://canvas.ucdavis.edu/courses/975590/assignments/1433327]
     - [ ] Implement public function `uthread_yield()`
     - [ ] Implement public function `uthread_create()`
     - [ ] Implement public function `uthread_exit()`
+    - [ ] Test public function `uthread_run()`
+    - [ ] Test public function `uthread_yield()`
+    - [ ] Test public function `uthread_create()`
+    - [ ] Test public function `uthread_exit()`
 - Private data structure
     - [ ] Implement TCB data structure `struct uthread_tct`
     - [ ] Implement private function `uthread_block()`
@@ -34,6 +44,10 @@ Semaphore Implementation, described in `./libuthread/sem.h`
 - [ ] Implement function `sem_destroy()`
 - [ ] Implement function `sem_down()`
 - [ ] Implement function `sem_up()`
+- [ ] Test function `sem_create()`
+- [ ] Test function `sem_destroy()`
+- [ ] Test function `sem_down()`
+- [ ] Test function `sem_up()`
 
 ## Phase 4: preemption ##
 
@@ -42,4 +56,8 @@ Preemption Implementation, described in `./libuthread/private.h`
 - [ ] Implement function `preempt_enable()`
 - [ ] Implement function `preempt_start()`
 - [ ] Implement function `preempt_stop()`
+- [ ] Test function `preempt_disable()`
+- [ ] Test function `preempt_enable()`
+- [ ] Test function `preempt_start()`
+- [ ] Test function `preempt_stop()`
 - [ ] Create a tester program `./apps/test_preempt.c`
