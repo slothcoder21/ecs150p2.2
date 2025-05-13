@@ -26,18 +26,20 @@ Assignment Page: [https://canvas.ucdavis.edu/courses/975590/assignments/1433327]
 ## Phase 2: uthread API ##
 
 - (Non-preemptive) Public API, described in `./libuthread/uthread.h`
-    - [ ] Implement public function `uthread_run()`
-    - [ ] Implement public function `uthread_yield()`
-    - [ ] Implement public function `uthread_create()`
-    - [ ] Implement public function `uthread_exit()`
+    - [X] Implement public function `uthread_run()`
+    - [X] Implement public function `uthread_yield()`
+    - [X] Implement public function `uthread_create()`
+    - [X] Implement public function `uthread_exit()`
     - [ ] Test public function `uthread_run()`
     - [ ] Test public function `uthread_yield()`
     - [ ] Test public function `uthread_create()`
     - [ ] Test public function `uthread_exit()`
 - Private data structure
-    - [ ] Implement TCB data structure `struct uthread_tct`
-    - [ ] Implement private function `uthread_block()`
-    - [ ] Implement private function `uthread_unblock()`
+    - [X] Implement TCB data structure `struct uthread_tcb`
+    - [X] Implement private function `uthread_block()`
+    - [X] Implement private function `uthread_unblock()`
+    - [ ] Test private function `uthread_block()`
+    - [ ] Test private function `uthread_unblock()`
 
 ## Phase 3: semaphore API ##
 
