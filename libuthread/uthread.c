@@ -25,7 +25,6 @@ enum tcb_state {
  * - Execution context of the thread
  */
 struct uthread_tcb {
-	/* TODO Phase 2 */
 	void *stack_ptr;
 	enum tcb_state state;
 	uthread_ctx_t context;
@@ -37,7 +36,6 @@ static struct uthread_tcb *current_thread;
 
 struct uthread_tcb *uthread_current(void)
 {
-	/* TODO Phase 2/3 */
 	return current_thread;
 }
 
@@ -87,7 +85,7 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
 		return -1;
 
 	if (!(main_ctx->stack_ptr = uthread_ctx_alloc_stack()))
-		return 1;
+		return -1;
 
 	if (uthread_create(func, arg))
 		return -1;

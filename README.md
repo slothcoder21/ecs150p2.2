@@ -30,10 +30,10 @@ Assignment Page: [https://canvas.ucdavis.edu/courses/975590/assignments/1433327]
     - [X] Implement public function `uthread_yield()`
     - [X] Implement public function `uthread_create()`
     - [X] Implement public function `uthread_exit()`
-    - [ ] Test public function `uthread_run()`
-    - [ ] Test public function `uthread_yield()`
-    - [ ] Test public function `uthread_create()`
-    - [ ] Test public function `uthread_exit()`
+    - [X] Test public function `uthread_run()`
+    - [X] Test public function `uthread_yield()`
+    - [X] Test public function `uthread_create()`
+    - [X] Test public function `uthread_exit()`
 - Private data structure
     - [X] Implement TCB data structure `struct uthread_tcb`
     - [X] Implement private function `uthread_block()`
