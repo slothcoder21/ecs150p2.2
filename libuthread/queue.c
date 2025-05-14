@@ -3,6 +3,9 @@
 #include <string.h>
 
 #include "queue.h"
+#include "private.h"
+#include "sem.h"
+
 
 struct queue_node;
 typedef struct queue_node* node_t;

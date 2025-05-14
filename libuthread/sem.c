@@ -3,16 +3,16 @@
 
 #include "sem.h"
 #include "queue.h"
-#include "private.h"    // for preempt_disable/enable, uthread_block, uthread_unblock, uthread_self()
+#include "private.h"    // for preempt_disable/enable, uthread_current, uthread_block, uthread_unblock
 
 struct semaphore {
-    int        count;    /* semaphore count, can go negative when threads wait */
-    queue_t    waiting;  /* queue of blocked threads */
+    int     count;    /* semaphore count, can go negative when threads wait */
+    queue_t waiting;  /* queue of blocked threads */
 };
 
 sem_t sem_create(size_t count)
 {
-    struct semaphore *sem = malloc(sizeof(*sem));
+    struct semaphore *sem = malloc(sizeof *sem);
     if (!sem) return NULL;
 
     sem->count   = (int)count;
@@ -44,14 +44,13 @@ int sem_down(sem_t sem)
     preempt_disable();
     sem->count--;
     if (sem->count < 0) {
-        /* queue this thread, then re-enable and block */
-        queue_enqueue(sem->waiting, uthread_self());
+        /* enqueue current thread, re-enable preemption, then block */
+        queue_enqueue(sem->waiting, uthread_current());
         preempt_enable();
         uthread_block();
     } else {
         preempt_enable();
     }
-
     return 0;
 }
 
@@ -63,9 +62,9 @@ int sem_up(sem_t sem)
     sem->count++;
     if (sem->count <= 0) {
         /* wake exactly one waiter */
-        struct uthread_tcb *next;
-        queue_dequeue(sem->waiting, (void**)&next);
-        uthread_unblock(next);
+        void *tcb;
+        queue_dequeue(sem->waiting, &tcb);
+        uthread_unblock((struct uthread_tcb*)tcb);
     }
     preempt_enable();
 
