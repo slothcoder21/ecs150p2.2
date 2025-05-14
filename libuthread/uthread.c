@@ -55,8 +55,8 @@ void uthread_exit(void)
 
 int uthread_create(uthread_func_t func, void *arg)
 {
+	preempt_disable();
 	struct uthread_tcb *thread = malloc(sizeof(struct uthread_tcb)); 
-
 	if (!thread) {
 		return -1;
 	}
@@ -66,6 +66,7 @@ int uthread_create(uthread_func_t func, void *arg)
 
 	thread->state = READY;
 	uthread_ctx_init(&thread->context, thread->stack_ptr, func, arg);
+	preempt_enable();
 	queue_enqueue(thread_q, thread);
 
 	return 0;
@@ -74,9 +75,7 @@ int uthread_create(uthread_func_t func, void *arg)
 int uthread_run(bool preempt, uthread_func_t func, void *arg)
 {
 	/* TODO */
-	if (preempt) {
-		
-	}
+	preempt_start(preempt);
 
 	if (!(thread_q = queue_create()))
 		return -1;
@@ -90,19 +89,19 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
 	if (uthread_create(func, arg))
 		return -1;
 
+	//preempt_disable();
 	while(queue_destroy(thread_q) != 0) {
 		queue_dequeue(thread_q, (void**)&current_thread);
 		if (current_thread->state == READY) {
 			current_thread->state = RUNNING;
 			main_ctx->state = READY;
+			preempt_disable();
 			uthread_ctx_switch(&main_ctx->context, &current_thread->context);
+			preempt_enable();
 			main_ctx->state = RUNNING;
-			if (current_thread->state == READY || current_thread->state == BLOCKED) 
-				queue_enqueue(thread_q, current_thread);
-			else {
-				uthread_ctx_destroy_stack((current_thread)->stack_ptr);
-				free(current_thread);
-			}
+			if (current_thread->state == RUNNING)
+				current_thread->state = TERMINATED;
+			queue_enqueue(thread_q, current_thread);
 		}
 		else if ((current_thread)->state == TERMINATED) {
 			uthread_ctx_destroy_stack((current_thread)->stack_ptr);
@@ -111,6 +110,8 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg)
 		else if ((current_thread)->state == BLOCKED)
 			queue_enqueue(thread_q, current_thread);
 	}
+
+	preempt_stop();
 
 	return 0;
 }
