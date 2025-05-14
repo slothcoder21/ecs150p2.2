@@ -52,23 +52,23 @@ int queue_destroy(queue_t queue)
 
 int queue_enqueue(queue_t queue, void *data)
 {
-	if (!queue || !data)
-		return -1;
+	if (!queue || data == NULL)
+        return -1;
 
-	node_t new_node = malloc(sizeof(node_t));
-	if (!new_node)
-		return -1;
+    struct queue_node *node = malloc(sizeof *node);
+    if (!node) return -1;
 
-	new_node->node_data = data;
-	if (queue->last)
-		queue->last->next = new_node;
-	queue->last = new_node;
-	if (queue->length == 0)
-		queue->first = new_node;
+    node->node_data = data;
+    node->next = NULL;
 
-	queue->length++;
+    if (queue->last)
+        queue->last->next = node;
+    else
+        queue->first = node;
 
-	return 0;
+    queue->last = node;
+    queue->length++;
+    return 0;
 };
 
 int queue_dequeue(queue_t queue, void **data)
@@ -87,66 +87,44 @@ int queue_dequeue(queue_t queue, void **data)
 
 int queue_delete(queue_t queue, void *data)
 {
-	if (!queue || !data)
-		return -1;
+	if (!queue || data == NULL)
+        return -1;
 
-	node_t node_i = queue->first;
-	node_t temp_prev = NULL;
-	node_t temp_next = NULL;
-	
-	int found = -1;
+    struct queue_node *prev = NULL, *cur = queue->first;
+    while (cur) {
+        if (cur->node_data == data) {
+            if (prev)
+                prev->next = cur->next;
+            else
+                queue->first = cur->next;
 
-	while (node_i) {
-		temp_next = node_i->next;
-		if (node_i->node_data == data) {
-			free(node_i);
-			queue->length--;
-			if (!temp_prev)
-				queue->first = temp_next;
-			else
-				temp_prev->next = temp_next;
-			if (!temp_next) {
-				queue->last = temp_prev;
-				temp_prev->next = NULL;
-			} else if (temp_prev)
-				temp_prev->next = temp_next;
-			found = 0;
-			break;
-		}
-		temp_prev = node_i;
-		node_i = temp_next;
-	}
+            if (cur->next == NULL)
+                queue->last = prev;
 
-	return found;
+            free(cur);
+            queue->length--;
+            return 0;
+        }
+        prev = cur;
+        cur  = cur->next;
+    }
+    return -1;
 }
 
 int queue_iterate(queue_t queue, queue_func_t func)
 {
 	/* TODO Phase 1 */
 	if (!queue || !func)
-		return -1;
-
-	void *data_buffer = malloc(sizeof(int));
-	node_t node_i = queue->first;
-	node_t temp_next;
-	while (node_i) {
-		temp_next = node_i->next;
-
-		// Clone the data for safety
-		if (sizeof *node_i->node_data != sizeof *data_buffer) {
-			data_buffer = realloc(data_buffer, sizeof *node_i->node_data);
-		}
-		memcpy(data_buffer, node_i->node_data, sizeof *node_i->node_data);
-
-		func(queue, data_buffer);
-
-		node_i = temp_next;
-	}
-	free(data_buffer);
-	return 0;
+        return -1;
+    struct queue_node *cur = queue->first;
+    while (cur) {
+        func(queue, cur->node_data);
+        cur = cur->next;
+    }
+    return 0;
 }
 
 int queue_length(queue_t queue)
 {
-	return queue->length;
+	return queue ? queue->length : -1;
 }

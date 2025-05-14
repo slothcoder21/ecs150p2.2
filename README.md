@@ -42,14 +42,14 @@ Assignment Page: [https://canvas.ucdavis.edu/courses/975590/assignments/1433327]
 ## Phase 3: semaphore API ##
 
 Semaphore Implementation, described in `./libuthread/sem.h`
-- [ ] Implement function `sem_create()`
-- [ ] Implement function `sem_destroy()`
-- [ ] Implement function `sem_down()`
-- [ ] Implement function `sem_up()`
-- [ ] Test function `sem_create()`
-- [ ] Test function `sem_destroy()`
-- [ ] Test function `sem_down()`
-- [ ] Test function `sem_up()`
+- [X] Implement function `sem_create()`
+- [X] Implement function `sem_destroy()`
+- [X] Implement function `sem_down()`
+- [X] Implement function `sem_up()`
+- [X] Test function `sem_create()`
+- [X] Test function `sem_destroy()`
+- [X] Test function `sem_down()`
+- [X] Test function `sem_up()`
 
 ## Phase 4: preemption ##
 

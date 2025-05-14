@@ -3,7 +3,7 @@
 
 #include "sem.h"
 #include "queue.h"
-#include "private.h"
+#include "private.h"    // for preempt_disable/enable, uthread_block, uthread_unblock, uthread_self()
 
 struct semaphore {
     int        count;    /* semaphore count, can go negative when threads wait */
@@ -40,24 +40,34 @@ int sem_destroy(sem_t sem)
 int sem_down(sem_t sem)
 {
     if (!sem) return -1;
-    /* decrement count; if negative, block current thread */
-    if (--sem->count < 0) {
-        /* enqueue the current thread's TCB and block */
-        queue_enqueue(sem->waiting, uthread_current());
+
+    preempt_disable();
+    sem->count--;
+    if (sem->count < 0) {
+        /* queue this thread, then re-enable and block */
+        queue_enqueue(sem->waiting, uthread_self());
+        preempt_enable();
         uthread_block();
+    } else {
+        preempt_enable();
     }
+
     return 0;
 }
 
 int sem_up(sem_t sem)
 {
     if (!sem) return -1;
-    /* increment count; if there are waiters, wake one */
-    if (++sem->count <= 0) {
+
+    preempt_disable();
+    sem->count++;
+    if (sem->count <= 0) {
+        /* wake exactly one waiter */
         struct uthread_tcb *next;
-        /* dequeue a waiting thread's TCB */
         queue_dequeue(sem->waiting, (void**)&next);
         uthread_unblock(next);
     }
+    preempt_enable();
+
     return 0;
 }
