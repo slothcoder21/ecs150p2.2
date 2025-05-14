@@ -34,9 +34,12 @@ struct queue {
 
 queue_t queue_create(void)
 {
-	queue_t queue_ptr = malloc(sizeof(queue_t));
+    queue_t queue_ptr = malloc(sizeof *queue_ptr);
+
 	if (!queue_ptr)
-		return NULL;
+    {
+        return NULL;
+    }
 	queue_ptr->first = NULL;
 	queue_ptr->last = NULL;
 	queue_ptr->length = 0;
@@ -76,16 +79,24 @@ int queue_enqueue(queue_t queue, void *data)
 
 int queue_dequeue(queue_t queue, void **data)
 {
-	if (!queue || !data || queue->length == 0)
-		return -1;
+	if(!queue || !data || queue->length == 0)
+    {
+        return -1;
+    }
 
-	*data = queue->first->node_data;
-	node_t next_first = queue->first->next;
-	free(queue->first);
-	queue->first = next_first;
-	queue->length--;
+    struct queue_node *old = queue->first;
+    *data = old->node_data;
 
-	return 0;
+    queue->first = old->next;
+    free(old);
+    queue->length--;
+
+    if(queue->length == 0)
+    {
+        queue->last = NULL;
+    }
+
+    return 0; 
 }
 
 int queue_delete(queue_t queue, void *data)
