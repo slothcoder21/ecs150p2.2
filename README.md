@@ -56,12 +56,12 @@ Semaphore Implementation, described in `./libuthread/sem.h`
 ## Phase 4: preemption ##
 
 Preemption Implementation, described in `./libuthread/private.h`
-- [ ] Implement function `preempt_disable()`
-- [ ] Implement function `preempt_enable()`
-- [ ] Implement function `preempt_start()`
-- [ ] Implement function `preempt_stop()`
+- [X] Implement function `preempt_disable()`
+- [X] Implement function `preempt_enable()`
+- [X] Implement function `preempt_start()`
+- [X] Implement function `preempt_stop()`
 - [ ] Test function `preempt_disable()`
 - [ ] Test function `preempt_enable()`
-- [ ] Test function `preempt_start()`
+- [X] Test function `preempt_start()`
 - [ ] Test function `preempt_stop()`
 - [ ] Create a tester program `./apps/test_preempt.c`
