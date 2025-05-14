@@ -30,10 +30,10 @@ Assignment Page: [https://canvas.ucdavis.edu/courses/975590/assignments/1433327]
     - [X] Implement public function `uthread_yield()`
     - [X] Implement public function `uthread_create()`
     - [X] Implement public function `uthread_exit()`
-    - [ ] Test public function `uthread_run()`
-    - [ ] Test public function `uthread_yield()`
-    - [ ] Test public function `uthread_create()`
-    - [ ] Test public function `uthread_exit()`
+    - [X] Test public function `uthread_run()`
+    - [X] Test public function `uthread_yield()`
+    - [X] Test public function `uthread_create()`
+    - [X] Test public function `uthread_exit()`
 - Private data structure
     - [X] Implement TCB data structure `struct uthread_tcb`
     - [X] Implement private function `uthread_block()`
@@ -56,12 +56,12 @@ Semaphore Implementation, described in `./libuthread/sem.h`
 ## Phase 4: preemption ##
 
 Preemption Implementation, described in `./libuthread/private.h`
-- [ ] Implement function `preempt_disable()`
-- [ ] Implement function `preempt_enable()`
-- [ ] Implement function `preempt_start()`
-- [ ] Implement function `preempt_stop()`
+- [X] Implement function `preempt_disable()`
+- [X] Implement function `preempt_enable()`
+- [X] Implement function `preempt_start()`
+- [X] Implement function `preempt_stop()`
 - [ ] Test function `preempt_disable()`
 - [ ] Test function `preempt_enable()`
-- [ ] Test function `preempt_start()`
+- [X] Test function `preempt_start()`
 - [ ] Test function `preempt_stop()`
 - [ ] Create a tester program `./apps/test_preempt.c`
