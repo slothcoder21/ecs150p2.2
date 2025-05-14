@@ -1,91 +1,63 @@
 #include <stddef.h>
 #include <stdlib.h>
 
+#include "sem.h"
 #include "queue.h"
 #include "private.h"
-#include "sem.h"
 
 struct semaphore {
-	/* TODO Phase 3 */
-
-	size_t count;
-	queue_t waiting;
+    int        count;    /* semaphore count, can go negative when threads wait */
+    queue_t    waiting;  /* queue of blocked threads */
 };
 
 sem_t sem_create(size_t count)
 {
-	/* TODO Phase 3 */
-	sem_t sem = malloc(sizeof(*sem));
-	if(!sem)
-	{
-		return NULL;
-	}
+    struct semaphore *sem = malloc(sizeof(*sem));
+    if (!sem) return NULL;
 
-	sem->count = count;
-	sem->waiting = queue_create();
-	if(!sem->waiting)
-	{
-		free(sem);
-		return NULL;
-	}
+    sem->count   = (int)count;
+    sem->waiting = queue_create();
+    if (!sem->waiting) {
+        free(sem);
+        return NULL;
+    }
 
-	return sem;
+    return sem;
 }
 
 int sem_destroy(sem_t sem)
 {
-	/* TODO Phase 3 */
+    if (!sem) return -1;
+    /* cannot destroy if threads are still waiting */
+    if (queue_length(sem->waiting) != 0)
+        return -1;
 
-	if(!sem || !queue_size(sem->waiting))
-	{
-		return -1;
-	}
-
-	queue_destroy(sem->waiting);
-	free(sem);
-	return 0;
+    queue_destroy(sem->waiting);
+    free(sem);
+    return 0;
 }
 
 int sem_down(sem_t sem)
 {
-	/* TODO Phase 3 */
-	if(!sem)
-	{
-		return -1;
-	}
-
-	if(sem->count == 0)
-	{
-		sem->count--;
-	}
-	else
-	{
-		queue_enqueue(sem->waiting, uthread_current());
-		uthread_block();
-	}
-
-	return 0;
+    if (!sem) return -1;
+    /* decrement count; if negative, block current thread */
+    if (--sem->count < 0) {
+        /* enqueue the current thread's TCB and block */
+        queue_enqueue(sem->waiting, uthread_current());
+        uthread_block();
+    }
+    return 0;
 }
 
 int sem_up(sem_t sem)
 {
-	/* TODO Phase 3 */
-
-	if(!sem)
-	{
-		return -1;
-	}
-
-	if(!queue_empty(sem->waiting))
-	{
-		struct uthread_tcb *t = queue_dequeue(sem->waiting, NULL);
-		uthread_block(); 
-	}
-	else
-	{
-		sem->count++;
-	}
-
-	return 0;
+    if (!sem) return -1;
+    /* increment count; if there are waiters, wake one */
+    if (++sem->count <= 0) {
+        struct uthread_tcb *next;
+        /* dequeue a waiting thread's TCB */
+        queue_dequeue(sem->waiting, (void**)&next);
+        uthread_unblock(next);
+    }
+    return 0;
 }
-

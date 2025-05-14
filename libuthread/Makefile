@@ -1,6 +1,6 @@
-objs := queue.o
+objs := queue.o sem.o
 
-CFLAGS := -Wall -Wextra -Werror
+CFLAGS := -std=c99 -D_XOPEN_SOURCE=700 -Wall -Wextra -Werror -I. 
 CC := gcc
 
 # Target library
