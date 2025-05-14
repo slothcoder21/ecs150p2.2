@@ -81,4 +81,3 @@ void preempt_stop(void)
 		preempt_active = false;
 	}
 }
-

@@ -1,4 +1,4 @@
-objs := queue.o uthread.o preempt.o
+objs := queue.o uthread.o preempt.o sem.o
 
 CFLAGS := -Wall -Wextra -Werror
 CFLAGS += -MMD
