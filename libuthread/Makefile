@@ -1,6 +1,7 @@
-objs := uthread.o queue.o sem.o
+objs := queue.o uthread.o preempt.o sem.o
 
-CFLAGS := -std=c99 -D_XOPEN_SOURCE=700 -Wall -Wextra -Werror -I.
+CFLAGS := -Wall -Wextra -Werror
+CFLAGS += -MMD
 CC := gcc
 
 # Target library
@@ -9,12 +10,15 @@ lib := libuthread.a
 all: $(lib)
 
 ## TODO: Phase 1
-all: $(lib)
+$(lib): ${objs}
+	ar rcs $@ ${objs}
 
-$(lib): $(objs) ar rcs $@ $^
+# Include dependencies
+deps := $(patsubst %.o,%.d,$(objs))
+-include $(deps)
 
-%.o: %.c %.h
+%.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
-	rm -f $(lib) $(objs)
+	rm -f $(lib) $(objs) $(deps)
