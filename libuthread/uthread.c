@@ -7,17 +7,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
-#include <ucontext.h>              // for getcontext
+#include <ucontext.h>              
 
-#include "private.h"              // preempt and low-level thread ops
-#include "uthread.h"              // public uthread API
-#include "queue.h"                // queue_t and operations
-#include "context.c"              // uthread_ctx_t, uthread_ctx_init, ctx_switch, alloc/destroy
+#include "private.h"              
+#include "uthread.h"              
+#include "queue.h"                
+#include "context.c"
 
 // Possible thread states
 enum tcb_state { READY, RUNNING, BLOCKED, TERMINATED };
 
-// Thread control block
+/* Thread control block which stores thread state and context */
 struct uthread_tcb {
     void          *stack_ptr;  // pointer to allocated stack (NULL for main)
     uthread_ctx_t  context;    // saved execution context
@@ -29,12 +29,12 @@ static queue_t              thread_q    = NULL;  // queue of threads
 static struct uthread_tcb  *current_thread = NULL;  // currently running thread
 static struct uthread_tcb  *main_ctx        = NULL;  // main scheduler context
 
-// Return pointer to the running thread's TCB
+/* Return pointer to the running thread's TCB */
 struct uthread_tcb *uthread_current(void) {
     return current_thread;
 }
 
-// Yield execution: mark current thread READY and switch to scheduler
+/* Yield execution: mark current thread READY and switch to scheduler */
 void uthread_yield(void) {
     struct uthread_tcb *t = uthread_current();
     assert(t != NULL);
@@ -43,7 +43,7 @@ void uthread_yield(void) {
     uthread_ctx_switch(&t->context, &main_ctx->context);
 }
 
-// Exit current thread: mark TERMINATED and switch to scheduler
+/* Exit current thread: mark TERMINATED and switch to scheduler */
 void uthread_exit(void) {
     struct uthread_tcb *t = uthread_current();
     assert(t != NULL);
@@ -51,7 +51,7 @@ void uthread_exit(void) {
     uthread_ctx_switch(&t->context, &main_ctx->context);
 }
 
-// Create a new thread running func(arg)
+/* Create a new thread running func(arg) */
 int uthread_create(uthread_func_t func, void *arg) {
     preempt_disable();
 
@@ -76,7 +76,7 @@ int uthread_create(uthread_func_t func, void *arg) {
     return 0;
 }
 
-// Start threading system: create initial thread and run scheduler
+/* Start threading system: create initial thread and run scheduler */
 int uthread_run(bool preempt, uthread_func_t func, void *arg) {
     // Start periodic timer if preemption requested
     preempt_start(preempt);
@@ -109,7 +109,7 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg) {
         return -1;
     }
 
-    // Scheduler loop: run until no threads remain
+    /* Main scheduler loop: run until no threads remain */
     while (queue_length(thread_q) > 0) {
         struct uthread_tcb *t = NULL;
 
@@ -150,7 +150,7 @@ int uthread_run(bool preempt, uthread_func_t func, void *arg) {
     return 0;
 }
 
-// Block the current thread: switch to scheduler
+/* Block the current thread: switch to scheduler */
 void uthread_block(void) {
     struct uthread_tcb *t = uthread_current();
     assert(t != NULL);
@@ -158,7 +158,7 @@ void uthread_block(void) {
     uthread_ctx_switch(&t->context, &main_ctx->context);
 }
 
-// Unblock a thread: mark READY and enqueue it
+/* Unblock a thread: mark READY and enqueue it */
 void uthread_unblock(struct uthread_tcb *t) {
     if (!t || t->state != BLOCKED)
         return;

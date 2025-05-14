@@ -27,11 +27,12 @@ struct queue_node {
  * to the middle elements of the list.
  */
 struct queue {
-	node_t first;
-	node_t last;
-	int length;
+	node_t first;    /* pointer to first node */
+	node_t last;     /* pointer to last node for O(1) enqueue */
+	int length;      /* number of elements in queue */
 };
 
+/* Create and initialize an empty queue */
 queue_t queue_create(void)
 {
     queue_t queue_ptr = malloc(sizeof *queue_ptr);
@@ -46,6 +47,7 @@ queue_t queue_create(void)
 	return queue_ptr;
 }
 
+/* Free queue resources - can only destroy an empty queue */
 int queue_destroy(queue_t queue)
 {
 	if (!queue || queue->length > 0)
@@ -56,6 +58,7 @@ int queue_destroy(queue_t queue)
 	}
 }
 
+/* Add data to the back of the queue */
 int queue_enqueue(queue_t queue, void *data)
 {
 	if (!queue || data == NULL)
@@ -77,6 +80,7 @@ int queue_enqueue(queue_t queue, void *data)
     return 0;
 };
 
+/* Remove data from the front of the queue */
 int queue_dequeue(queue_t queue, void **data)
 {
 	if(!queue || !data || queue->length == 0)
@@ -99,6 +103,7 @@ int queue_dequeue(queue_t queue, void **data)
     return 0; 
 }
 
+/* Remove the node containing the specified data pointer */
 int queue_delete(queue_t queue, void *data)
 {
 	if (!queue || data == NULL)
@@ -125,6 +130,7 @@ int queue_delete(queue_t queue, void *data)
     return -1;
 }
 
+/* Apply function to each data item in the queue */
 int queue_iterate(queue_t queue, queue_func_t func)
 {
 	/* TODO Phase 1 */
@@ -138,6 +144,7 @@ int queue_iterate(queue_t queue, queue_func_t func)
     return 0;
 }
 
+/* Return number of items in queue, or -1 if queue is invalid */
 int queue_length(queue_t queue)
 {
 	return queue ? queue->length : -1;

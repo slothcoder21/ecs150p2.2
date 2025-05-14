@@ -5,11 +5,13 @@
 #include "queue.h"
 #include "private.h"    // for preempt_disable/enable, uthread_current, uthread_block, uthread_unblock
 
+/* Semaphore structure for thread synchronization */
 struct semaphore {
     int     count;    /* semaphore count, can go negative when threads wait */
     queue_t waiting;  /* queue of blocked threads */
 };
 
+/* Create a new semaphore with initial count */
 sem_t sem_create(size_t count)
 {
     struct semaphore *sem = malloc(sizeof *sem);
@@ -25,6 +27,7 @@ sem_t sem_create(size_t count)
     return sem;
 }
 
+/* Destroy a semaphore - fails if threads are still waiting */
 int sem_destroy(sem_t sem)
 {
     if (!sem) return -1;
@@ -37,6 +40,7 @@ int sem_destroy(sem_t sem)
     return 0;
 }
 
+/* Decrement semaphore - block if count becomes negative */
 int sem_down(sem_t sem)
 {
     if (!sem) return -1;
@@ -54,6 +58,7 @@ int sem_down(sem_t sem)
     return 0;
 }
 
+/* Increment semaphore - wake one waiting thread if any */
 int sem_up(sem_t sem)
 {
     if (!sem) return -1;
