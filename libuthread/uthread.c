@@ -1,3 +1,5 @@
+/* uthread.c: User-level threads library implementation */
+
 #include <assert.h>
 #include <signal.h>
 #include <stddef.h>
@@ -5,125 +7,163 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
+#include <ucontext.h>              // for getcontext
 
-#include "private.h"
-#include "context.c"
-#include "uthread.h"
-#include "queue.h"
+#include "private.h"              // preempt and low-level thread ops
+#include "uthread.h"              // public uthread API
+#include "queue.h"                // queue_t and operations
+#include "context.c"              // uthread_ctx_t, uthread_ctx_init, ctx_switch, alloc/destroy
 
-enum tcb_state {
-	READY,
-	RUNNING,
-	BLOCKED,
-	TERMINATED
-};
+// Possible thread states
+enum tcb_state { READY, RUNNING, BLOCKED, TERMINATED };
 
-/*
- * Define uthread_tcb as a struct with
- * - A stack pointer
- * - A state enum variable
- * - Execution context of the thread
- */
+// Thread control block
 struct uthread_tcb {
-	void *stack_ptr;
-	enum tcb_state state;
-	uthread_ctx_t context;
+    void          *stack_ptr;  // pointer to allocated stack (NULL for main)
+    uthread_ctx_t  context;    // saved execution context
+    enum tcb_state state;      // current state
 };
 
-static queue_t thread_q;
-static struct uthread_tcb *main_ctx;
-static struct uthread_tcb *current_thread;
+// Global scheduler state
+static queue_t              thread_q    = NULL;  // queue of threads
+static struct uthread_tcb  *current_thread = NULL;  // currently running thread
+static struct uthread_tcb  *main_ctx        = NULL;  // main scheduler context
 
-struct uthread_tcb *uthread_current(void)
-{
-	return current_thread;
+// Return pointer to the running thread's TCB
+struct uthread_tcb *uthread_current(void) {
+    return current_thread;
 }
 
-void uthread_yield(void)
-{
-	struct uthread_tcb *current = uthread_current();
-	current->state = READY;
-	uthread_ctx_switch(&current->context, &main_ctx->context);
+// Yield execution: mark current thread READY and switch to scheduler
+void uthread_yield(void) {
+    struct uthread_tcb *t = uthread_current();
+    assert(t != NULL);
+    t->state = READY;
+    queue_enqueue(thread_q, t);
+    uthread_ctx_switch(&t->context, &main_ctx->context);
 }
 
-void uthread_exit(void)
-{
-	struct uthread_tcb *current = uthread_current();
-	current->state = TERMINATED;
-	uthread_ctx_switch(&current->context, &main_ctx->context);
+// Exit current thread: mark TERMINATED and switch to scheduler
+void uthread_exit(void) {
+    struct uthread_tcb *t = uthread_current();
+    assert(t != NULL);
+    t->state = TERMINATED;
+    uthread_ctx_switch(&t->context, &main_ctx->context);
 }
 
-int uthread_create(uthread_func_t func, void *arg)
-{
-	preempt_disable();
-	struct uthread_tcb *thread = malloc(sizeof(struct uthread_tcb)); 
-	if (!thread) {
-		return -1;
-	}
+// Create a new thread running func(arg)
+int uthread_create(uthread_func_t func, void *arg) {
+    preempt_disable();
 
-	if (!(thread->stack_ptr = uthread_ctx_alloc_stack()))
-		return -1;
+    struct uthread_tcb *t = malloc(sizeof *t);
+    if (!t) {
+        preempt_enable();
+        return -1;
+    }
 
-	thread->state = READY;
-	uthread_ctx_init(&thread->context, thread->stack_ptr, func, arg);
-	preempt_enable();
-	queue_enqueue(thread_q, thread);
+    t->stack_ptr = uthread_ctx_alloc_stack();
+    if (!t->stack_ptr) {
+        free(t);
+        preempt_enable();
+        return -1;
+    }
 
-	return 0;
+    t->state = READY;
+    uthread_ctx_init(&t->context, t->stack_ptr, func, arg);
+    queue_enqueue(thread_q, t);
+
+    preempt_enable();
+    return 0;
 }
 
-int uthread_run(bool preempt, uthread_func_t func, void *arg)
-{
-	/* TODO */
-	preempt_start(preempt);
+// Start threading system: create initial thread and run scheduler
+int uthread_run(bool preempt, uthread_func_t func, void *arg) {
+    // Start periodic timer if preemption requested
+    preempt_start(preempt);
 
-	if (!(thread_q = queue_create()))
-		return -1;
+    // Initialize thread queue
+    thread_q = queue_create();
+    if (!thread_q) {
+        preempt_stop();
+        return -1;
+    }
 
-	if (!(main_ctx = malloc(sizeof(struct uthread_tcb))))
-		return -1;
+    // Allocate TCB for main context (scheduler)
+    main_ctx = malloc(sizeof *main_ctx);
+    if (!main_ctx) {
+        queue_destroy(thread_q);
+        preempt_stop();
+        return -1;
+    }
+    main_ctx->stack_ptr = NULL;
+    main_ctx->state     = RUNNING;
 
-	if (!(main_ctx->stack_ptr = uthread_ctx_alloc_stack()))
-		return -1;
+    // Capture the current (main) context
+    getcontext(&main_ctx->context);
 
-	if (uthread_create(func, arg))
-		return -1;
+    // Create the user thread
+    if (uthread_create(func, arg) != 0) {
+        free(main_ctx);
+        queue_destroy(thread_q);
+        preempt_stop();
+        return -1;
+    }
 
-	//preempt_disable();
-	while(queue_destroy(thread_q) != 0) {
-		queue_dequeue(thread_q, (void**)&current_thread);
-		if (current_thread->state == READY) {
-			current_thread->state = RUNNING;
-			main_ctx->state = READY;
-			preempt_disable();
-			uthread_ctx_switch(&main_ctx->context, &current_thread->context);
-			preempt_enable();
-			main_ctx->state = RUNNING;
-			if (current_thread->state == RUNNING)
-				current_thread->state = TERMINATED;
-			queue_enqueue(thread_q, current_thread);
-		}
-		else if ((current_thread)->state == TERMINATED) {
-			uthread_ctx_destroy_stack((current_thread)->stack_ptr);
-			free(current_thread);
-		}
-		else if ((current_thread)->state == BLOCKED)
-			queue_enqueue(thread_q, current_thread);
-	}
+    // Scheduler loop: run until no threads remain
+    while (queue_length(thread_q) > 0) {
+        struct uthread_tcb *t = NULL;
 
-	preempt_stop();
+        preempt_disable();
+        queue_dequeue(thread_q, (void**)&t);
+        preempt_enable();
 
-	return 0;
+        if (!t)
+            continue;
+
+        if (t->state == READY) {
+            current_thread = t;
+            t->state       = RUNNING;
+
+            // Switch from scheduler to thread
+            uthread_ctx_switch(&main_ctx->context, &t->context);
+
+            // Upon return, thread has yielded or exited
+            current_thread = NULL;
+
+            if (t->state == READY) {
+                // Thread yielded: requeue
+                preempt_disable();
+                queue_enqueue(thread_q, t);
+                preempt_enable();
+            } else if (t->state == TERMINATED) {
+                // Thread exited: clean up
+                uthread_ctx_destroy_stack(t->stack_ptr);
+                free(t);
+            }
+        }
+    }
+
+    // Clean up scheduler
+    queue_destroy(thread_q);
+    preempt_stop();
+    free(main_ctx);
+    return 0;
 }
 
-void uthread_block(void)
-{
-	struct uthread_tcb *current = uthread_current();
-	current->state = BLOCKED;
-	uthread_ctx_switch(&current->context, &main_ctx->context);
+// Block the current thread: switch to scheduler
+void uthread_block(void) {
+    struct uthread_tcb *t = uthread_current();
+    assert(t != NULL);
+    t->state = BLOCKED;
+    uthread_ctx_switch(&t->context, &main_ctx->context);
 }
 
-void uthread_unblock(struct uthread_tcb *uthread)
-{
-	uthread->state = READY;
+// Unblock a thread: mark READY and enqueue it
+void uthread_unblock(struct uthread_tcb *t) {
+    if (!t || t->state != BLOCKED)
+        return;
+    t->state = READY;
+    preempt_disable();
+    queue_enqueue(thread_q, t);
+    preempt_enable();
 }
