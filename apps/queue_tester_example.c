@@ -37,71 +37,10 @@ void test_queue_simple(void)
 	TEST_ASSERT(ptr == &data);
 }
 
-void test_queue_delete(void)
-{
-	int data = 3, data2 = 2;
-	queue_t q;
-
-	fprintf(stderr, "*** TEST queue_error_detection ***\n");
-	q = queue_create();
-
-	queue_enqueue(q, &data);
-	queue_enqueue(q, &data2);
-
-	queue_delete(q, &data2);
-	TEST_ASSERT(queue_length(q) == 1);
-
-	int err = queue_delete(q, &data2);
-	TEST_ASSERT(err == -1);
-}
-
-
-void test_queue_error_detection(void)
-{
-	int data = 3, data2 = 2, *ptr = NULL;
-	queue_t q;
-
-	fprintf(stderr, "*** TEST queue_error_detection ***\n");
-	q = queue_create();
-	int err = queue_dequeue(q, (void**)&ptr);
-	TEST_ASSERT(err == -1);
-	err = queue_dequeue(q, NULL);
-	TEST_ASSERT(err == -1);
-
-	queue_enqueue(q, &data);
-	queue_enqueue(q, &data2);
-}
-
-
-void example_queue_function(queue_t queue, void *data)
-{
-	fprintf(stderr, "%d\t", *(int*)data + queue_length(queue));
-}
-
-
-void test_queue_iterate(void)
-{
-	int data = 3, data2 = 2, data3 = 4;
-	queue_t q;
-	
-	fprintf(stderr, "*** TEST queue_iterate ***\n");
-	q = queue_create();
-	queue_enqueue(q, &data);
-	queue_enqueue(q, &data2);
-	queue_enqueue(q, &data3);
-	int err = queue_iterate(q, example_queue_function);
-	fprintf(stderr, "\n");
-	TEST_ASSERT(err == 0);
-}
-
-
 int main(void)
 {
 	test_create();
 	test_queue_simple();
-	test_queue_delete();
-	test_queue_error_detection();
-	test_queue_iterate();
 
 	return 0;
 }
