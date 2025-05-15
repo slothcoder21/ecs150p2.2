@@ -137,8 +137,9 @@ int queue_iterate(queue_t queue, queue_func_t func)
         return -1;
     struct queue_node *cur = queue->first;
     while (cur) {
+        node_t temp_next = cur->next;
         func(queue, cur->node_data);
-        cur = cur->next;
+        cur = temp_next;
     }
     return 0;
 }
