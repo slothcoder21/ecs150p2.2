@@ -74,7 +74,6 @@ void preempt_start(bool preempt)
 
 void preempt_stop(void)
 {
-	/* TODO Phase 4 */
 	if (preempt_active) {
 		setitimer(ITIMER_VIRTUAL, &timer_storage, NULL);
 		sigaction(SIGVTALRM, &sigstorage, NULL);
