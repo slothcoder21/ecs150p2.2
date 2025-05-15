@@ -133,7 +133,6 @@ int queue_delete(queue_t queue, void *data)
 /* Apply function to each data item in the queue */
 int queue_iterate(queue_t queue, queue_func_t func)
 {
-	/* TODO Phase 1 */
 	if (!queue || !func)
         return -1;
     struct queue_node *cur = queue->first;
