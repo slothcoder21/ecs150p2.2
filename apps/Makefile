@@ -5,7 +5,7 @@ programs := \
 	uthread_hello.x \
 	uthread_yield.x \
 	uthread_exit.x \
-	preempt_test.x
+	test_preempt.x
 
 # User-level thread library
 UTHREADLIB := libuthread
