@@ -20,7 +20,7 @@ Assignment Page: [https://canvas.ucdavis.edu/courses/975590/assignments/1433327]
     - [X] Test function `queue_delete()`
     - [X] Test function `queue_iterate()`
     - [X] Test function `queue_length()`
-- [?] Complete Makefile
+- [X] Complete Makefile
 - [X] Create a tester program `./apps/queue_tester.c`
 
 ## Phase 2: uthread API ##
@@ -60,8 +60,8 @@ Preemption Implementation, described in `./libuthread/private.h`
 - [X] Implement function `preempt_enable()`
 - [X] Implement function `preempt_start()`
 - [X] Implement function `preempt_stop()`
-- [ ] Test function `preempt_disable()`
-- [ ] Test function `preempt_enable()`
+- [X] Test function `preempt_disable()`
+- [X] Test function `preempt_enable()`
 - [X] Test function `preempt_start()`
-- [ ] Test function `preempt_stop()`
-- [ ] Create a tester program `./apps/test_preempt.c`
+- [X] Test function `preempt_stop()`
+- [X] Create a tester program `./apps/test_preempt.c`
