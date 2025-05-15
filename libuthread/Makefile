@@ -9,7 +9,6 @@ lib := libuthread.a
 
 all: $(lib)
 
-## TODO: Phase 1
 $(lib): ${objs}
 	ar rcs $@ ${objs}
 
