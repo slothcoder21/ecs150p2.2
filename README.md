@@ -38,8 +38,8 @@ Assignment Page: [https://canvas.ucdavis.edu/courses/975590/assignments/1433327]
     - [X] Implement TCB data structure `struct uthread_tcb`
     - [X] Implement private function `uthread_block()`
     - [X] Implement private function `uthread_unblock()`
-    - [ ] Test private function `uthread_block()`
-    - [ ] Test private function `uthread_unblock()`
+    - [X] Test private function `uthread_block()`
+    - [X] Test private function `uthread_unblock()`
 
 ## Phase 3: semaphore API ##
 
